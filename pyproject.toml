@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "working-vacancies-hh-ru"
+version = "0.1.0"
+description = ""
+authors = ["Maria Ivanova <moi066@mail.ru>"]
+readme = "README.md"
+packages = [{include = "working_vacancies_hh"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
