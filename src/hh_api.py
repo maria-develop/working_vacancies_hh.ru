@@ -3,6 +3,8 @@ import os
 from abc import ABC, abstractmethod
 import requests
 
+from src.vacancy import Vacancy
+
 
 class JobAPI(ABC):
     @abstractmethod
@@ -53,10 +55,18 @@ class HeadHunterAPI(JobAPI):
         """Получение абсолютного пути к файлу данных."""
         return os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', filename)
 
+    @staticmethod
+    def load_vacancies_from_json(filename: str) -> list:
+        """Загрузка вакансий из JSON файла и преобразование их в объекты Vacancy"""
+        path = HeadHunterAPI.get_data_file_path(filename)
+        with open(path, 'r', encoding='utf-8') as f:
+            vacancies = json.load(f)
+        return Vacancy.cast_to_object_list(vacancies)
+
 
 if __name__ == "__main__":
     hh_api = HeadHunterAPI()
-    keyword = "альметьевск"  # Ваш поисковый запрос
+    keyword = "Python"  # Ваш поисковый запрос
     vacancies = hh_api.get_vacancies(keyword)
 
     # Вывод списка вакансий
