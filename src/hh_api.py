@@ -3,13 +3,8 @@ import os
 from abc import ABC, abstractmethod
 import requests
 
+from src.api import JobAPI
 from src.vacancy import Vacancy
-
-
-class JobAPI(ABC):
-    @abstractmethod
-    def get_vacancies(self, keyword: str):
-        pass
 
 
 class HeadHunterAPI(JobAPI):
@@ -24,13 +19,23 @@ class HeadHunterAPI(JobAPI):
         """Выгрузка вакансий с проверкой статус-кода 200"""
         self.params['text'] = keyword
         vacancies = []
-        for page in range(20):
+        for page in range(1000):
             self.params['page'] = page
             response = requests.get(self.url, headers=self.headers, params=self.params)
             if response.status_code != 200:
                 break
             vacancies.extend(response.json().get('items', []))
         return vacancies
+
+    # def get_vacancies(self, keyword, per_page=20):
+    #     params = {
+    #         'text': keyword,
+    #         'area': 1,  # Area code for Russia
+    #         'per_page': 20,
+    #         'page': 0
+    #     }
+    #     response = requests.get(self.url, params=params)
+    #     return response.json().get('items', [])
 
 
     def save_vacancies_to_json(self, keyword: str, vacancies: list):
@@ -41,7 +46,7 @@ class HeadHunterAPI(JobAPI):
         # os.makedirs('C:/Users/User/Desktop/python_rpoject_Maria/working_vacancies_hh.ru/data', exist_ok=True)
 
         # Определите имя файла с помощью ключевого слова
-        filename = os.path.join(data_dir, f"{keyword}_vacancies.json")
+        filename = os.path.join(data_dir, f"vacancies.json")
         # filename = os.path.join("C:/Users/User/Desktop/python_rpoject_Maria/working_vacancies_hh.ru/data", f"{keyword}_vacancies.json")
 
         # Сохранение вакансий в JSON-файл
