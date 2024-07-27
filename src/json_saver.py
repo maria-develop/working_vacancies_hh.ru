@@ -1,13 +1,14 @@
 import json
 import os
+from typing import List
 
-from src.hh_api import HeadHunterAPI
 from src.vacancy import Vacancy
+
 
 class JSONSaver:
     """Класс для работы с сохранением вакансий в JSON файл."""
 
-    def __init__(self, filename):
+    def __init__(self, filename: str) -> None:
         self.filename = self.get_data_file_path(filename)
 
     @staticmethod
@@ -15,21 +16,12 @@ class JSONSaver:
         """Получение абсолютного пути к файлу данных."""
         return os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', filename)
 
-    # @staticmethod
-    # def load_vacancies_from_json(filename: str) -> list:
-    #     """Загрузка вакансий из JSON файла и преобразование их в объекты Vacancy"""
-    #     path = HeadHunterAPI.get_data_file_path(filename)
-    #     with open(path, 'r', encoding='utf-8') as f:
-    #         vacancies = json.load(f)
-    #     return Vacancy.cast_to_object_list(vacancies)
-
-    def save_vacancies(self, vacancies):
+    def save_vacancies(self, vacancies: List[Vacancy]) -> None:
         """Сохраняет список вакансий в JSON файл."""
         with open(self.filename, 'w', encoding='utf-8') as f:
-            json.dump([vacancy.__dict__ for vacancy in vacancies], f, ensure_ascii=False, indent=4)
+            json.dump([vacancy.to_dict() for vacancy in vacancies], f, ensure_ascii=False, indent=4)
 
-
-    def load_vacancies(self):
+    def load_vacancies(self) -> List[Vacancy]:
         """Загружает список вакансий из JSON файла."""
         try:
             with open(self.filename, 'r', encoding='utf-8') as f:
@@ -46,8 +38,7 @@ class JSONSaver:
             print(f"Произошла ошибка: {e}")
             return []
 
-
-    def add_vacancy(self, vacancy):
+    def add_vacancy(self, vacancy: Vacancy) -> None:
         """Добавляет вакансию в JSON файл."""
         vacancies = self.load_vacancies()
         vacancies.append(vacancy)

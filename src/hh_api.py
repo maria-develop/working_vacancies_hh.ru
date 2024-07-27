@@ -1,6 +1,5 @@
 import json
 import os
-from abc import ABC, abstractmethod
 import requests
 
 from src.api import JobAPI
@@ -15,45 +14,33 @@ class HeadHunterAPI(JobAPI):
         self.headers = {'User-Agent': 'HH-User-Agent'}
         self.params = {'text': '', 'page': 0, 'per_page': 100}
 
-    def get_vacancies(self, keyword: str):
+    def get_vacancies(self, keyword_vac: str):
         """Выгрузка вакансий с проверкой статус-кода 200"""
-        self.params['text'] = keyword
-        vacancies = []
+        self.params['text'] = keyword_vac
+        vacancies_word = []
         for page in range(1000):
             self.params['page'] = page
             response = requests.get(self.url, headers=self.headers, params=self.params)
             if response.status_code != 200:
                 break
-            vacancies.extend(response.json().get('items', []))
-        return vacancies
+            vacancies_word.extend(response.json().get('items', []))
+        return vacancies_word
 
-    # def get_vacancies(self, keyword, per_page=20):
-    #     params = {
-    #         'text': keyword,
-    #         'area': 1,  # Area code for Russia
-    #         'per_page': 20,
-    #         'page': 0
-    #     }
-    #     response = requests.get(self.url, params=params)
-    #     return response.json().get('items', [])
-
-
-    def save_vacancies_to_json(self, keyword: str, vacancies: list):
+    @staticmethod
+    def save_vacancies_to_json(keyword_vac: str, vacancies_word: list):
         """Сохранение вакансий в JSON файл"""
         # Определение пути к директории data в корне проекта
         data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
         os.makedirs(data_dir, exist_ok=True)
-        # os.makedirs('C:/Users/User/Desktop/python_rpoject_Maria/working_vacancies_hh.ru/data', exist_ok=True)
 
         # Определите имя файла с помощью ключевого слова
         filename = os.path.join(data_dir, f"vacancies.json")
-        # filename = os.path.join("C:/Users/User/Desktop/python_rpoject_Maria/working_vacancies_hh.ru/data", f"{keyword}_vacancies.json")
 
         # Сохранение вакансий в JSON-файл
         with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(vacancies, f, ensure_ascii=False, indent=4)
+            json.dump(vacancies_word, f, ensure_ascii=False, indent=4)
 
-        print(f"Вакансии сохранены в файл {filename}")
+        print(f"Вакансии по запросу '{keyword_vac}' сохранены в файл data/vacancies.json")
 
     @staticmethod
     def get_data_file_path(filename: str) -> str:
@@ -65,8 +52,8 @@ class HeadHunterAPI(JobAPI):
         """Загрузка вакансий из JSON файла и преобразование их в объекты Vacancy"""
         path = HeadHunterAPI.get_data_file_path(filename)
         with open(path, 'r', encoding='utf-8') as f:
-            vacancies = json.load(f)
-        return Vacancy.cast_to_object_list(vacancies)
+            vacancies_from_json = json.load(f)
+        return Vacancy.cast_to_object_list(vacancies_from_json)
 
 
 if __name__ == "__main__":

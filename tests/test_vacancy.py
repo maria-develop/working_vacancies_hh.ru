@@ -1,18 +1,117 @@
 import unittest
-
+from unittest.mock import patch, mock_open
+import json
 from src.vacancy import Vacancy
 
-
 class TestVacancy(unittest.TestCase):
-    def test_cast_to_object_list(self):
-        vacancies = [
-            {
-                'name': 'Python Developer',
-                'alternate_url': 'http://example.com',
-                'salary': {'from': 100000},
-                'snippet': {'responsibility': 'Develop software'}
-            }
-        ]
-        vacancy_objects = Vacancy.cast_to_object_list(vacancies)
-        self.assertEqual(len(vacancy_objects), 1)
-        self.assertEqual(vacancy_objects[0].name, 'Python Developer')
+
+    def setUp(self):
+        """Устанавливаем базовые данные для тестов"""
+        self.vacancy_data = {
+            'id': '123',
+            'name': 'Python Developer',
+            'area': {'name': 'Москва'},
+            'alternate_url': 'http://example.com',
+            'salary': {'from': 1000, 'to': 2000},
+            'description': 'Test description',
+            'snippet': {'requirement': 'Python, Django', 'responsibility': 'Developing applications'}
+        }
+        self.vacancy = Vacancy(
+            id=self.vacancy_data['id'],
+            name=self.vacancy_data['name'],
+            area=self.vacancy_data['area'],
+            url=self.vacancy_data['alternate_url'],
+            salary=self.vacancy_data['salary'],
+            description=self.vacancy_data['description'],
+            snippet=self.vacancy_data['snippet']
+        )
+
+    def test_vacancy_initialization(self):
+        """Тест инициализации объекта Vacancy"""
+        self.assertEqual(self.vacancy.id_vac, self.vacancy_data['id'])
+        self.assertEqual(self.vacancy.name, self.vacancy_data['name'])
+        self.assertEqual(self.vacancy.area, self.vacancy_data['area'])
+        self.assertEqual(self.vacancy.url, self.vacancy_data['alternate_url'])
+        self.assertEqual(self.vacancy.salary, (1000, 2000))
+        self.assertEqual(self.vacancy.description, self.vacancy_data['description'])
+        self.assertEqual(self.vacancy.snippet, self.vacancy_data['snippet'])
+
+    def test_vacancy_str(self):
+        """Тест строкового представления объекта Vacancy"""
+        expected_str = (
+            "Вакансия: Python Developer\n"
+            "Ссылка: http://example.com\n"
+            "Зарплата: 1000-2000\n"
+            "Описание: Test description"
+        )
+        self.assertEqual(str(self.vacancy), expected_str)
+
+    def test_vacancy_equality(self):
+        """Тест сравнения вакансий по зарплате"""
+        vacancy_same_salary = Vacancy(
+            id='124',
+            name='Another Developer',
+            area={'name': 'Москва'},
+            url='http://another.com',
+            salary={'from': 1000, 'to': 2000},
+            description='Another description',
+            snippet={}
+        )
+        vacancy_diff_salary = Vacancy(
+            id='125',
+            name='Another Developer',
+            area={'name': 'Москва'},
+            url='http://another.com',
+            salary={'from': 1500, 'to': 2500},
+            description='Another description',
+            snippet={}
+        )
+        self.assertEqual(self.vacancy, vacancy_same_salary)
+        self.assertNotEqual(self.vacancy, vacancy_diff_salary)
+
+    def test_vacancy_comparison(self):
+        """Тест операторов сравнения по зарплате"""
+        lower_salary = Vacancy(
+            id='126',
+            name='Junior Developer',
+            area={'name': 'Москва'},
+            url='http://junior.com',
+            salary={'from': 500, 'to': 1000},
+            description='Junior description',
+            snippet={}
+        )
+        higher_salary = Vacancy(
+            id='127',
+            name='Senior Developer',
+            area={'name': 'Москва'},
+            url='http://senior.com',
+            salary={'from': 2000, 'to': 3000},
+            description='Senior description',
+            snippet={}
+        )
+        self.assertGreater(self.vacancy, lower_salary)
+        self.assertLess(self.vacancy, higher_salary)
+
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.path.exists', return_value=True)
+    def test_load_vacancies(self, mock_exists, mock_file):
+        """Тест загрузки вакансий из JSON файла"""
+        mock_file().read.return_value = json.dumps([self.vacancy_data])
+        vacancies = Vacancy.load_vacancies('path/to/vacancies.json')
+        self.assertEqual(len(vacancies), 1)
+        self.assertIsInstance(vacancies[0], Vacancy)
+        self.assertEqual(vacancies[0].name, 'Python Developer')
+
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.path.exists', return_value=True)
+    def test_delete_vacancy(self, mock_exists, mock_file):
+        """Тест удаления вакансии из JSON файла"""
+        mock_file().read.return_value = json.dumps([self.vacancy_data])
+        Vacancy.delete_vacancy(self.vacancy, 'path/to/vacancies.json')
+        mock_file().write.assert_called_once()
+        written_data = json.loads(mock_file().write.call_args[0][0])
+        self.assertEqual(len(written_data), 0)
+
+
+if __name__ == '__main__':
+    unittest.main()

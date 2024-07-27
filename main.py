@@ -5,6 +5,7 @@ from src.vacancy import Vacancy
 
 
 def user_interaction():
+    """Взаимодействие с пользователем для управления вакансиями."""
     hh_api = HeadHunterAPI()
     json_saver = JSONSaver('vacancies.json')
 
@@ -31,14 +32,6 @@ def user_interaction():
             print(f"Добавлено {len(vacancies_list)} вакансий по запросу '{keyword}'.")
             sys.exit()
 
-        # elif option == '2':
-        #     n = int(input("Введите количество вакансий: "))
-        #     top_vacancies = sorted(vacancies, key=lambda x: x.salary if isinstance(x.salary, int) else 0, reverse=True)[
-        #                     :n]
-        #     for vacancy in top_vacancies:
-        #         print(vacancy)
-        #     sys.exit()
-
         elif option == '2':
             try:
                 n = int(input("Введите количество вакансий для вывода в топ: "))
@@ -46,45 +39,34 @@ def user_interaction():
                 print("Пожалуйста, введите целое число.")
                 continue
 
-            """Загрузка вакансий из файла"""
+            # Загрузка вакансий из файла
             vacancies = json_saver.load_vacancies()
             if not vacancies:
                 print("Нет сохраненных вакансий.")
                 continue
 
-            """Определяем функцию для извлечения зарплаты из объекта вакансии"""
-            def get_salary(vacancy):
-                if isinstance(vacancy.salary, dict):
+            # Определяем функцию для извлечения зарплаты из объекта вакансии
+            def get_salary(vacancy_salary: Vacancy) -> int:
+                if isinstance(vacancy_salary.salary, dict):
                     # Если salary - это словарь, извлекаем значение из поля 'from'
-                    salary_from = vacancy.salary.get('from', 0)
-                    return salary_from if salary_from is not None else 0
-                elif isinstance(vacancy.salary, (int, float)):
+                    salary_from_ = vacancy_salary.salary.get('from', 0)
+                    return salary_from_ if salary_from_ is not None else 0
+                elif isinstance(vacancy_salary.salary, (int, float)):
 
                     # Если salary - это уже число
-                    return vacancy.salary
+                    return vacancy_salary.salary
                 return 0
 
-            """Сортировка вакансий по убыванию зарплаты"""
+            # Сортировка вакансий по убыванию зарплаты
             top_vacancies = sorted(vacancies, key=get_salary, reverse=True)[:n]
             for vacancy in top_vacancies:
                 print(vacancy)
             sys.exit()
 
-
-        # elif option == '3':
-        #     keyword = input("Введите ключевое слово для фильтрации вакансий: ")
-        #     filtered_vacancies = [vacancy for vacancy in vacancies if keyword.lower() in vacancy.description.lower()]
-        #     if filtered_vacancies:
-        #         for vacancy in filtered_vacancies:
-        #             print(vacancy)
-        #     else:
-        #         print(f"Вакансии с ключевым словом '{keyword}' не найдены.")
-        #     sys.exit()
-
         elif option == '3':
             keyword = input("Введите ключевое слово для фильтрации вакансий: ").lower()
 
-            """Загрузка вакансий из файла"""
+            # Загрузка вакансий из файла
             vacancies = json_saver.load_vacancies()
             if not vacancies:
                 print("Нет сохраненных вакансий.")
@@ -92,7 +74,7 @@ def user_interaction():
             filtered_vacancies = []
             for vacancy in vacancies:
 
-                """Собираем все текстовые данные для поиска"""
+                # Собираем все текстовые данные для поиска
                 searchable_text = ''
                 if vacancy.description:
                     searchable_text += vacancy.description.lower()
@@ -103,7 +85,7 @@ def user_interaction():
                     if 'responsibility' in snippet and snippet['responsibility']:
                         searchable_text += ' ' + snippet['responsibility'].lower()
 
-                """Проверяем наличие ключевого слова"""
+                # Проверяем наличие ключевого слова
                 if keyword in searchable_text:
                     filtered_vacancies.append(vacancy)
             if filtered_vacancies:
@@ -112,7 +94,6 @@ def user_interaction():
             else:
                 print(f"Вакансии с ключевым словом '{keyword}' не найдены.")
             sys.exit()
-
 
         elif option == '4':
             print("Введите диапазон зарплат")
