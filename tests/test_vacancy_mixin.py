@@ -1,6 +1,8 @@
-import pytest
-from src.vacancy_mixin import VacancyMixin
 from unittest.mock import MagicMock
+
+import pytest
+
+from src.vacancy_mixin import VacancyMixin
 
 
 class TestVacancy(VacancyMixin):

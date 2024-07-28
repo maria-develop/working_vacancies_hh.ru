@@ -1,7 +1,9 @@
-import unittest
-import pytest
-from unittest.mock import patch, mock_open
 import json
+import unittest
+from unittest.mock import mock_open, patch
+
+import pytest
+
 from src.vacancy import Vacancy
 
 

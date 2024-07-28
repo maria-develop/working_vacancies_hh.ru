@@ -1,8 +1,10 @@
-import pytest
 import os
-from src.vacancy import Vacancy
-from src.json_saver import JSONSaver
+
+import pytest
+
 from src.hh_api import HeadHunterAPI
+from src.json_saver import JSONSaver
+from src.vacancy import Vacancy
 
 
 @pytest.fixture

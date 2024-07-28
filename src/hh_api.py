@@ -1,7 +1,8 @@
 import json
 import os
+from typing import Any, List
+
 import requests
-from typing import List, Any
 
 from src.api import JobAPI
 from src.vacancy import Vacancy

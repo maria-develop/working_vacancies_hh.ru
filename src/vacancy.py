@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional
 
 from src.vacancy_mixin import VacancyMixin
 

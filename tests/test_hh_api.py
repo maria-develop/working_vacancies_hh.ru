@@ -1,7 +1,7 @@
-import unittest
-from unittest.mock import patch, mock_open, MagicMock
 import json
 import os
+import unittest
+from unittest.mock import MagicMock, mock_open, patch
 
 from src.hh_api import HeadHunterAPI
 from src.vacancy import Vacancy
