@@ -2,8 +2,10 @@ import json
 import os
 from typing import Union, Tuple, Optional
 
+from src.vacancy_mixin import VacancyMixin
 
-class Vacancy:
+
+class Vacancy(VacancyMixin):
     """
     Класс, представляющий вакансию.
 
@@ -33,9 +35,9 @@ class Vacancy:
         self.snippet = snippet if snippet else {}
         self.kwargs = kwargs
 
-    def __repr__(self) -> str:
-        return (f"Vacancy(id={self.id_vac}, name={self.name}, area={self.area}, url={self.url}, "
-                f"salary={self.salary}, description={self.description}, snippet={self.snippet})")
+    # def __repr__(self) -> str:
+    #     return (f"Vacancy(id={self.id_vac}, name={self.name}, area={self.area}, url={self.url}, "
+    #             f"salary={self.salary}, description={self.description}, snippet={self.snippet})")
 
     def __str__(self):
         """Возвращает строковое представление объекта вакансии."""

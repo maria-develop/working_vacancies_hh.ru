@@ -60,5 +60,4 @@ def test_user_interaction_salary_range(mock_input, MockJSONSaver):
 
     with pytest.raises(SystemExit):
         user_interaction()
-
     mock_json_saver.load_vacancies.assert_called_once()

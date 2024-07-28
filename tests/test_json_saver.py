@@ -1,32 +1,8 @@
 import json
-import os
+
 from unittest.mock import patch, mock_open
 import pytest
-from src.vacancy import Vacancy
-from src.json_saver import JSONSaver
 
-@pytest.fixture
-def mock_vacancy_data():
-    """Создает тестовые данные вакансии."""
-    return {
-        'id': '123',
-        'name': 'Python Developer',
-        'area': {'name': 'Москва'},
-        'url': 'http://example.com',
-        'salary': (1000, 2000),
-        'description': 'Test description',
-        'snippet': {'requirement': 'Python, Django', 'responsibility': 'Developing applications'}
-    }
-
-@pytest.fixture
-def mock_vacancy(mock_vacancy_data):
-    """Создает объект Vacancy для тестов."""
-    return Vacancy(**mock_vacancy_data)
-
-@pytest.fixture
-def json_saver():
-    """Создает объект JSONSaver для тестов."""
-    return JSONSaver('test_vacancies.json')
 
 @patch('builtins.open', new_callable=mock_open)
 @patch('src.json_saver.JSONSaver.get_data_file_path', return_value='test_vacancies.json')
@@ -54,5 +30,5 @@ def test_load_vacancies_json_decode_error(mock_get_data_file_path, mock_file, js
     assert vacancies == []
 
 
-if __name__ == '__main__':
-    pytest.main()
+# if __name__ == '__main__':
+#     pytest.main()

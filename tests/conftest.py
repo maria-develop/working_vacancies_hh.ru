@@ -1,40 +1,73 @@
 import pytest
-from unittest.mock import MagicMock
-from src.hh_api import HeadHunterAPI
-from src.json_saver import JSONSaver
+import os
 from src.vacancy import Vacancy
+from src.json_saver import JSONSaver
+from src.hh_api import HeadHunterAPI
 
 
 @pytest.fixture
-def mock_hh_api():
-    api = MagicMock(spec=HeadHunterAPI)
-    api.get_vacancies.return_value = [
-        {'id': '1', 'name': 'Python Developer', 'area': {'name': 'Москва'},
-         'url': 'http://example.com', 'salary': {'from': 1000}, 'description': 'Test description',
-         'snippet': {'requirement': 'Python', 'responsibility': 'Developing applications'}},
-        {'id': '2', 'name': 'Java Developer', 'area': {'name': 'Санкт-Петербург'},
-         'url': 'http://example.com', 'salary': {'from': 2000}, 'description': 'Another description',
-         'snippet': {'requirement': 'Java', 'responsibility': 'Developing Java applications'}}
-    ]
-    return api
+def mock_vacancy_data():
+    """Создает тестовые данные вакансии."""
+    return {
+        'id': '123',
+        'name': 'Python Developer',
+        'area': {'name': 'Москва'},
+        'url': 'http://example.com',
+        'salary': (1000, 2000),
+        'description': 'Test description',
+        'snippet': {'requirement': 'Python, Django', 'responsibility': 'Developing applications'}
+    }
 
+# @pytest.fixture
+# def mock_vacancy(mock_vacancy_data):
+#     """Создает объект Vacancy для тестов."""
+#     return Vacancy(**mock_vacancy_data)
 
-@pytest.fixture
-def mock_json_saver():
-    saver = MagicMock(spec=JSONSaver)
-    saver.load_vacancies.return_value = [
-        Vacancy(id=1, name='Python Developer', area={'name': 'Москва'}, url='http://example.com',
-                salary=1000, description='Test description',
-                snippet={'requirement': 'Python', 'responsibility': 'Developing applications'}),
-        Vacancy(id=2, name='Java Developer', area={'name': 'Санкт-Петербург'}, url='http://example.com',
-                salary=2000, description='Another description',
-                snippet={'requirement': 'Java', 'responsibility': 'Developing Java applications'})
-    ]
-    return saver
-
+# @pytest.fixture
+# def json_saver():
+#     """Создает объект JSONSaver для тестов."""
+#     return JSONSaver('test_vacancies.json')
 
 @pytest.fixture
-def mock_vacancy():
-    return Vacancy(id=123, name='Python Developer', area={'name': 'Москва'},
-                   url='http://example.com', salary=0, description='Test description',
-                   snippet={'requirement': 'Python, Django', 'responsibility': 'Developing applications'})
+def sample_vacancy():
+    return Vacancy(
+        id=123,
+        name="Python Developer",
+        area={"name": "Москва"},
+        url="http://example.com",
+        salary=(1000, 2000),
+        description="Test description",
+        snippet={"requirement": "Python, Django", "responsibility": "Developing applications"}
+    )
+
+@pytest.fixture
+def json_saver():
+    return JSONSaver("test_vacancies.json")
+
+# @pytest.fixture
+# def hh_api():
+#     return HeadHunterAPI()
+
+# @pytest.fixture
+# def mock_response():
+#     class MockResponse:
+#         def __init__(self, json_data, status_code):
+#             self.json_data = json_data
+#             self.status_code = status_code
+#
+#         def json(self):
+#             return self.json_data
+
+    return MockResponse
+
+@pytest.fixture
+def vacancy_data():
+    return {
+        "id": 124,
+        "name": "Java Developer",
+        "area": {"name": "Москва"},
+        "url": "http://example.com",
+        "salary": (1500, 2500),
+        "description": "Test description 2",
+        "snippet": {"requirement": "Java, Spring", "responsibility": "Developing applications"}
+    }

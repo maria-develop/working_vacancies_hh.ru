@@ -1,7 +1,9 @@
 import unittest
+import pytest
 from unittest.mock import patch, mock_open
 import json
 from src.vacancy import Vacancy
+
 
 class TestVacancy(unittest.TestCase):
 
@@ -113,5 +115,169 @@ class TestVacancy(unittest.TestCase):
         self.assertEqual(len(written_data), 0)
 
 
-if __name__ == '__main__':
-    unittest.main()
+def test_vacancy_init_valid_data():
+    vacancy = Vacancy(
+        id="1",
+        name="Software Engineer",
+        area={"name": "Moscow"},
+        url="http://example.com",
+        salary={"from": 1000, "to": 2000},
+        description="A great job",
+        snippet={"requirement": "Experience with Python", "responsibility": "Develop applications"}
+    )
+    assert vacancy.id_vac == "1"
+    assert vacancy.name == "Software Engineer"
+    assert vacancy.area == {"name": "Moscow"}
+    assert vacancy.url == "http://example.com"
+    assert vacancy.salary == (1000, 2000)
+    assert vacancy.description == "A great job"
+    assert vacancy.snippet == {"requirement": "Experience with Python", "responsibility": "Develop applications"}
+
+
+def test_vacancy_init_invalid_name():
+    with pytest.raises(ValueError):
+        Vacancy(
+            id="1",
+            name="",
+            area={"name": "Moscow"},
+            url="http://example.com",
+            salary={"from": 1000, "to": 2000}
+        )
+
+
+def test_vacancy_init_invalid_url():
+    with pytest.raises(ValueError):
+        Vacancy(
+            id="1",
+            name="Software Engineer",
+            area={"name": "Moscow"},
+            url="",
+            salary={"from": 1000, "to": 2000}
+        )
+
+
+def test_vacancy_lt():
+    vac1 = Vacancy(
+        id="1",
+        name="Software Engineer",
+        area={"name": "Moscow"},
+        url="http://example.com",
+        salary={"from": 1000, "to": 2000}
+    )
+    vac2 = Vacancy(
+        id="2",
+        name="Software Engineer",
+        area={"name": "Moscow"},
+        url="http://example.com",
+        salary={"from": 2000, "to": 3000}
+    )
+    assert vac1 < vac2
+
+
+def test_vacancy_gt():
+    vac1 = Vacancy(
+        id="1",
+        name="Software Engineer",
+        area={"name": "Moscow"},
+        url="http://example.com",
+        salary={"from": 3000, "to": 4000}
+    )
+    vac2 = Vacancy(
+        id="2",
+        name="Software Engineer",
+        area={"name": "Moscow"},
+        url="http://example.com",
+        salary={"from": 2000, "to": 3000}
+    )
+    assert vac1 > vac2
+
+
+def test_validate_salary_dict():
+    salary = {"from": 1000, "to": 2000}
+    validated_salary = Vacancy._validate_salary(salary)
+    assert validated_salary == (1000, 2000)
+
+
+def test_validate_salary_dict_from_only():
+    salary = {"from": 1000}
+    validated_salary = Vacancy._validate_salary(salary)
+    assert validated_salary == 1000
+
+
+def test_validate_salary_dict_to_only():
+    salary = {"to": 2000}
+    validated_salary = Vacancy._validate_salary(salary)
+    assert validated_salary == 2000
+
+
+def test_validate_salary_dict_empty():
+    salary = {}
+    validated_salary = Vacancy._validate_salary(salary)
+    assert validated_salary == 0
+
+
+def test_validate_salary_str_not_specified():
+    salary = "не указано"
+    validated_salary = Vacancy._validate_salary(salary)
+    assert validated_salary == 0
+
+
+def test_validate_salary_str_digit():
+    salary = "3000"
+    validated_salary = Vacancy._validate_salary(salary)
+    assert validated_salary == 3000
+
+
+def test_validate_salary_str_range():
+    salary = "1000-2000"
+    validated_salary = Vacancy._validate_salary(salary)
+    assert validated_salary == (1000, 2000)
+
+
+def test_validate_salary_str_invalid():
+    salary = "invalid"
+    validated_salary = Vacancy._validate_salary(salary)
+    assert validated_salary == 0
+
+
+def test_get_salary_str():
+    vacancy = {
+        "salary": {
+            "from": 1000,
+            "to": 2000
+        }
+    }
+    salary_str = Vacancy._get_salary_str(vacancy)
+    assert salary_str == "1000-2000"
+
+
+def test_get_salary_str_from_only():
+    vacancy = {
+        "salary": {
+            "from": 1000
+        }
+    }
+    salary_str = Vacancy._get_salary_str(vacancy)
+    assert salary_str == "1000"
+
+
+def test_get_salary_str_to_only():
+    vacancy = {
+        "salary": {
+            "to": 2000
+        }
+    }
+    salary_str = Vacancy._get_salary_str(vacancy)
+    assert salary_str == "2000"
+
+
+def test_get_salary_str_not_specified():
+    vacancy = {
+        "salary": None
+    }
+    salary_str = Vacancy._get_salary_str(vacancy)
+    assert salary_str == "Не указано"
+
+
+# if __name__ == '__main__':
+#     unittest.main()
