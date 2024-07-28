@@ -4,10 +4,10 @@ from src.json_saver import JSONSaver
 from src.vacancy import Vacancy
 
 
-def user_interaction():
+def user_interaction() -> None:
     """Взаимодействие с пользователем для управления вакансиями."""
     hh_api = HeadHunterAPI()
-    json_saver = JSONSaver('vacancies.json')
+    json_saver = JSONSaver("vacancies.json")
 
     # Загружаем все вакансии из файла перед началом взаимодействия с пользователем
     vacancies = json_saver.load_vacancies()
@@ -22,7 +22,7 @@ def user_interaction():
 
         option = input("Введите номер пункта: ")
 
-        if option == '1':
+        if option == "1":
             keyword = input("Введите ключевое слово для поиска: ")
             hh_vacancies = hh_api.get_vacancies(keyword)
             vacancies_list = Vacancy.cast_to_object_list(hh_vacancies)
@@ -32,7 +32,7 @@ def user_interaction():
             print(f"Добавлено {len(vacancies_list)} вакансий по запросу '{keyword}'.")
             sys.exit()
 
-        elif option == '2':
+        elif option == "2":
             try:
                 n = int(input("Введите количество вакансий для вывода в топ: "))
             except ValueError:
@@ -49,7 +49,7 @@ def user_interaction():
             def get_salary(vacancy_salary: Vacancy) -> int:
                 if isinstance(vacancy_salary.salary, dict):
                     # Если salary - это словарь, извлекаем значение из поля 'from'
-                    salary_from_ = vacancy_salary.salary.get('from', 0)
+                    salary_from_ = vacancy_salary.salary.get("from", 0)
                     return salary_from_ if salary_from_ is not None else 0
                 elif isinstance(vacancy_salary.salary, (int, float)):
 
@@ -63,7 +63,7 @@ def user_interaction():
                 print(vacancy)
             sys.exit()
 
-        elif option == '3':
+        elif option == "3":
             keyword = input("Введите ключевое слово для фильтрации вакансий: ").lower()
 
             # Загрузка вакансий из файла
@@ -75,15 +75,15 @@ def user_interaction():
             for vacancy in vacancies:
 
                 # Собираем все текстовые данные для поиска
-                searchable_text = ''
+                searchable_text = ""
                 if vacancy.description:
                     searchable_text += vacancy.description.lower()
                 if vacancy.snippet:
                     snippet = vacancy.snippet
-                    if 'requirement' in snippet and snippet['requirement']:
-                        searchable_text += ' ' + snippet['requirement'].lower()
-                    if 'responsibility' in snippet and snippet['responsibility']:
-                        searchable_text += ' ' + snippet['responsibility'].lower()
+                    if "requirement" in snippet and snippet["requirement"]:
+                        searchable_text += " " + snippet["requirement"].lower()
+                    if "responsibility" in snippet and snippet["responsibility"]:
+                        searchable_text += " " + snippet["responsibility"].lower()
 
                 # Проверяем наличие ключевого слова
                 if keyword in searchable_text:
@@ -95,12 +95,15 @@ def user_interaction():
                 print(f"Вакансии с ключевым словом '{keyword}' не найдены.")
             sys.exit()
 
-        elif option == '4':
+        elif option == "4":
             print("Введите диапазон зарплат")
             salary_from = int(input("от: "))
             salary_to = int(input("до: "))
-            filtered_vacancies = [vacancy for vacancy in vacancies if
-                                  isinstance(vacancy.salary, int) and salary_from <= vacancy.salary <= salary_to]
+            filtered_vacancies = [
+                vacancy
+                for vacancy in vacancies
+                if isinstance(vacancy.salary, int) and salary_from <= vacancy.salary <= salary_to
+            ]
 
             if filtered_vacancies:
                 for vacancy in filtered_vacancies:
@@ -109,7 +112,7 @@ def user_interaction():
                 print(f"Вакансии в диапазоне зарплат от {salary_from} до {salary_to} не найдены.")
             sys.exit()
 
-        elif option == '5':
+        elif option == "5":
             break
 
         else:

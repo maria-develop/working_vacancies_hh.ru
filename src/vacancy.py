@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Union, Tuple, Optional
+from typing import Optional, Dict, Any, List
 
 from src.vacancy_mixin import VacancyMixin
 
@@ -18,15 +18,22 @@ class Vacancy(VacancyMixin):
         description (Optional[str]): Описание вакансии.
         snippet (dict): Краткая информация о вакансии.
     """
+    id: str
+    name: str
+    area: Dict[str, Any]
+    url: str
+    salary: Optional[Dict[str, Any]]
+    description: Optional[str]
+    snippet: Optional[Dict[str, Any]]
+    kwargs: Any
 
-    def __init__(self, id: str, name: str, area: dict, url: str, salary: Union[int, Tuple[int, int]],
-                 description: Optional[str] = None, snippet: dict = None, **kwargs) -> None:
+    def __init__(self, id, name, area, url, salary, description=None, snippet=None, **kwargs) -> None:
         if not isinstance(name, str) or not name:
             raise ValueError("Название вакансии должно быть непустой строкой")
         if not isinstance(url, str) or not url:
             raise ValueError("URL должен быть непустой строкой")
 
-        self.id_vac = id
+        self.id = id
         self.name = name
         self.area = area
         self.url = url
@@ -36,39 +43,42 @@ class Vacancy(VacancyMixin):
         self.kwargs = kwargs
 
     # def __repr__(self) -> str:
-    #     return (f"Vacancy(id={self.id_vac}, name={self.name}, area={self.area}, url={self.url}, "
+    #     return (f"Vacancy(id={self.id}, name={self.name}, area={self.area}, url={self.url}, "
     #             f"salary={self.salary}, description={self.description}, snippet={self.snippet})")
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Возвращает строковое представление объекта вакансии."""
-        salary_str = f"{self.salary[0]}-{self.salary[1]}" if isinstance(self.salary, tuple) else (
-            self.salary if self.salary != 0 else "Зарплата не указана")
+        salary_str = (
+            f"{self.salary[0]}-{self.salary[1]}"
+            if isinstance(self.salary, tuple)
+            else (self.salary if self.salary != 0 else "Зарплата не указана")
+        )
         return f"Вакансия: {self.name}\nСсылка: {self.url}\nЗарплата: {salary_str}\nОписание: {self.description}"
 
-    def __eq__(self, other):
+    def __eq__(self, other: int) -> Any:
         """Сравнивает зарплату текущей вакансии с другой вакансией на равенство."""
         if isinstance(other, Vacancy):
             return self.salary == other.salary
         return False
 
-    def __lt__(self, other):
+    def __lt__(self, other: int) -> Any:
         """Сравнивает зарплату текущей вакансии с другой вакансией на меньше."""
         if isinstance(other, Vacancy):
             return self.salary < other.salary
         return False
 
-    def __gt__(self, other):
+    def __gt__(self, other: int) -> Any:
         """Сравнивает зарплату текущей вакансии с другой вакансией на больше"""
         if isinstance(other, Vacancy):
             return self.salary > other.salary
         return False
 
     @staticmethod
-    def _validate_salary(salary):
+    def _validate_salary(salary: tuple[Any | None, Any | None]) -> int | tuple[Any | None, Any | None]:
         """Валидирует и преобразует значение зарплаты."""
         if isinstance(salary, dict):
-            from_salary = salary.get('from')
-            to_salary = salary.get('to')
+            from_salary = salary.get("from")
+            to_salary = salary.get("to")
             if from_salary and to_salary:
                 return from_salary, to_salary
             if from_salary:
@@ -81,7 +91,7 @@ class Vacancy(VacancyMixin):
                 return 0
             if salary.isdigit():
                 return int(salary)
-            salary_parts = salary.replace(' ', '').split('-')
+            salary_parts = salary.replace(" ", "").split("-")
             if len(salary_parts) == 2 and all(part.isdigit() for part in salary_parts):
                 try:
                     return int(salary_parts[0]), int(salary_parts[1])
@@ -94,27 +104,28 @@ class Vacancy(VacancyMixin):
         return 0
 
     @staticmethod
-    def cast_to_object_list(vacancies):
+    def cast_to_object_list(vacancies: List[Dict[str, Any]]) -> list:
         """Преобразует список вакансий в список объектов класса Vacancy."""
         return [
             Vacancy(
-                id=vacancy.get('id', 'Не указано'),
-                name=vacancy.get('name', 'Не указано'),
-                area=vacancy.get('area', {}),
-                url=vacancy.get('alternate_url', 'Не указано'),
-                salary=vacancy.get('salary', {}),
-                description=vacancy.get('description', 'Не указано'),
-                snippet=vacancy.get('snippet', {})
-            ) for vacancy in vacancies
+                id=vacancy.get("id", "Не указано"),
+                name=vacancy.get("name", "Не указано"),
+                area=vacancy.get("area", {}),
+                url=vacancy.get("alternate_url", "Не указано"),
+                salary=vacancy.get("salary", {}),
+                description=vacancy.get("description", "Не указано"),
+                snippet=vacancy.get("snippet", {}),
+            )
+            for vacancy in vacancies
         ]
 
     @staticmethod
-    def _get_salary_str(vacancy):
+    def _get_salary_str(vacancy: Dict[str, Any]) -> str:
         """Возвращает зарплату в виде строки."""
-        salary = vacancy.get('salary')
+        salary = vacancy.get("salary")
         if salary:
-            from_salary = salary.get('from')
-            to_salary = salary.get('to')
+            from_salary = salary.get("from")
+            to_salary = salary.get("to")
             if from_salary and to_salary:
                 return f"{from_salary}-{to_salary}"
             if from_salary:
@@ -124,31 +135,46 @@ class Vacancy(VacancyMixin):
         return "Не указано"
 
     @staticmethod
-    def load_vacancies(file_p='C:/Users/User/Desktop/python_rpoject_Maria/working_vacancies_hh.ru/data/vacancies.json'):
+    def load_vacancies(
+        file_p: str = "C:/Users/User/Desktop/python_rpoject_Maria/working_vacancies_hh.ru/data/vacancies.json",
+    ) -> List['Vacancy']:
         """Загружает вакансии из JSON файла."""
         if not os.path.exists(file_p):
             return []
 
-        with open(file_p, 'r', encoding='utf-8') as file:
+        with open(file_p, "r", encoding="utf-8") as file:
             return Vacancy.cast_to_object_list(json.load(file))
 
     @staticmethod
-    def save_vacancies(vacancies,
-                       file_p='C:/Users/User/Desktop/python_rpoject_Maria/working_vacancies_hh.ru/data/vacancies.json'):
+    def save_vacancies(
+        vacancies: List['Vacancy'],
+            file_p: str = "C:/Users/User/Desktop/python_rpoject_Maria/working_vacancies_hh.ru/data/vacancies.json"
+    ):
         """Сохраняет вакансии в JSON файл."""
-        with open(file_p, 'w', encoding='utf-8') as file:
+        with open(file_p, "w", encoding="utf-8") as file:
             json.dump([vac.__dict__ for vac in vacancies], file, ensure_ascii=False, indent=4)
 
     @staticmethod
-    def delete_vacancy(vacancy,
-                       file_p='C:/Users/User/Desktop/python_rpoject_Maria/working_vacancies_hh.ru/data/vacancies.json'):
+    def delete_vacancy(
+        vacancy: Any, file_p: str = "C:/Users/User/Desktop/python_rpoject_Maria/working_vacancies_hh.ru/data/vacancies.json"
+    ):
         """Удаляет вакансию из JSON файла."""
         vacancies = Vacancy.load_vacancies(file_p)
         vacancies = [v for v in vacancies if v != vacancy]
         Vacancy.save_vacancies(vacancies, file_p)
 
-    def to_dict(self):
-        pass
+    def to_dict(self) -> Dict[str, Any]:
+        """Возвращает словарное представление объекта вакансии."""
+        return {
+            "id": self.id_vac,
+            "name": self.name,
+            "area": self.area,
+            "url": self.url,
+            "salary": self.salary,
+            "description": self.description,
+            "snippet": self.snippet,
+            **self.kwargs,
+        }
 
 
 # if __name__ == "__main__":
@@ -157,7 +183,7 @@ class Vacancy(VacancyMixin):
 #     hh_api = HeadHunterAPI()
 #     keyword = "экономист"
 #     hh_vacancies = hh_api.get_vacancies(keyword)
-    # vacancies_list = Vacancy.cast_to_object_list(hh_vacancies)
+# vacancies_list = Vacancy.cast_to_object_list(hh_vacancies)
 
-    # for vacancy in vacancies_list:
-    #     print(vacancy)
+# for vacancy in vacancies_list:
+#     print(vacancy)

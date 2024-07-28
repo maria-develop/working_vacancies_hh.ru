@@ -9,14 +9,15 @@ from src.hh_api import HeadHunterAPI
 def mock_vacancy_data():
     """Создает тестовые данные вакансии."""
     return {
-        'id': '123',
-        'name': 'Python Developer',
-        'area': {'name': 'Москва'},
-        'url': 'http://example.com',
-        'salary': (1000, 2000),
-        'description': 'Test description',
-        'snippet': {'requirement': 'Python, Django', 'responsibility': 'Developing applications'}
+        "id": "123",
+        "name": "Python Developer",
+        "area": {"name": "Москва"},
+        "url": "http://example.com",
+        "salary": (1000, 2000),
+        "description": "Test description",
+        "snippet": {"requirement": "Python, Django", "responsibility": "Developing applications"},
     }
+
 
 # @pytest.fixture
 # def mock_vacancy(mock_vacancy_data):
@@ -28,6 +29,7 @@ def mock_vacancy_data():
 #     """Создает объект JSONSaver для тестов."""
 #     return JSONSaver('test_vacancies.json')
 
+
 @pytest.fixture
 def sample_vacancy():
     return Vacancy(
@@ -37,28 +39,30 @@ def sample_vacancy():
         url="http://example.com",
         salary=(1000, 2000),
         description="Test description",
-        snippet={"requirement": "Python, Django", "responsibility": "Developing applications"}
+        snippet={"requirement": "Python, Django", "responsibility": "Developing applications"},
     )
+
 
 @pytest.fixture
 def json_saver():
     return JSONSaver("test_vacancies.json")
 
-# @pytest.fixture
-# def hh_api():
-#     return HeadHunterAPI()
+    # @pytest.fixture
+    # def hh_api():
+    #     return HeadHunterAPI()
 
-# @pytest.fixture
-# def mock_response():
-#     class MockResponse:
-#         def __init__(self, json_data, status_code):
-#             self.json_data = json_data
-#             self.status_code = status_code
-#
-#         def json(self):
-#             return self.json_data
+    # @pytest.fixture
+    # def mock_response():
+    #     class MockResponse:
+    #         def __init__(self, json_data, status_code):
+    #             self.json_data = json_data
+    #             self.status_code = status_code
+    #
+    #         def json(self):
+    #             return self.json_data
 
     return MockResponse
+
 
 @pytest.fixture
 def vacancy_data():
@@ -69,5 +73,5 @@ def vacancy_data():
         "url": "http://example.com",
         "salary": (1500, 2500),
         "description": "Test description 2",
-        "snippet": {"requirement": "Java, Spring", "responsibility": "Developing applications"}
+        "snippet": {"requirement": "Java, Spring", "responsibility": "Developing applications"},
     }
