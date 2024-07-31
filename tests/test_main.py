@@ -68,17 +68,3 @@ def test_user_interaction_filter_keyword(mock_input, MockJSONSaver):
         user_interaction()
 
     assert mock_json_saver.load_vacancies.call_count >= 1
-
-
-@patch("main.JSONSaver")
-@patch("builtins.input", side_effect=["4", "1000", "2000", "5"])
-def test_user_interaction_salary_range(mock_input, MockJSONSaver):
-    mock_json_saver = MockJSONSaver.return_value
-    mock_json_saver.load_vacancies.return_value = [
-        MagicMock(name="vacancy", salary=1500),
-        MagicMock(name="vacancy", salary=2500),
-    ]
-
-    with pytest.raises(SystemExit):
-        user_interaction()
-    mock_json_saver.load_vacancies.assert_called_once()

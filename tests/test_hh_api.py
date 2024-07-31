@@ -62,7 +62,7 @@ class TestHeadHunterAPI(unittest.TestCase):
         self.assertEqual(len(vacancies), 2)
         self.assertIsInstance(vacancies[0], Vacancy)
         self.assertEqual(vacancies[0].name, "Vacancy 1")
-
+        self.assertEqual(vacancies[1].name, "Vacancy 2")
 
 # if __name__ == '__main__':
 #     unittest.main()

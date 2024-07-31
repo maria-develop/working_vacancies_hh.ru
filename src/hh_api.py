@@ -13,17 +13,17 @@ class HeadHunterAPI(JobAPI):
 
     def __init__(self) -> None:
         """Определение ресурса и параметров для api"""
-        self.url = "https://api.hh.ru/vacancies"
-        self.headers = {"User-Agent": "HH-User-Agent"}
-        self.params = {"text": "", "page": 0, "per_page": 100}
+        self.__url = "https://api.hh.ru/vacancies"
+        self.__headers = {"User-Agent": "HH-User-Agent"}
+        self.__params = {"text": "", "page": 0, "per_page": 100}
 
     def get_vacancies(self, keyword_vac: str) -> List[Any]:
         """Выгрузка вакансий с проверкой статус-кода 200"""
-        self.params["text"] = keyword_vac
+        self.__params["text"] = keyword_vac
         vacancies_word = []
         for page in range(1000):
-            self.params["page"] = page
-            response = requests.get(self.url, headers=self.headers, params=self.params)
+            self.__params["page"] = page
+            response = requests.get(self.__url, headers=self.__headers, params=self.__params)
             if response.status_code != 200:
                 break
             vacancies_word.extend(response.json().get("items", []))
@@ -59,14 +59,14 @@ class HeadHunterAPI(JobAPI):
         return Vacancy.cast_to_object_list(vacancies_from_json)
 
 
-if __name__ == "__main__":
-    hh_api = HeadHunterAPI()
-    keyword = "Python"  # Ваш поисковый запрос
-    vacancies = hh_api.get_vacancies(keyword)
+# if __name__ == "__main__":
+#     hh_api = HeadHunterAPI()
+#     keyword = "Python"  # Ваш поисковый запрос
+#     vacancies = hh_api.get_vacancies(keyword)
 
     # Вывод списка вакансий
     # for vacancy in vacancies:
     #     print(vacancy)
 
     # Сохранение вакансий в JSON-файл
-    hh_api.save_vacancies_to_json(keyword, vacancies)
+    # hh_api.save_vacancies_to_json(keyword, vacancies)

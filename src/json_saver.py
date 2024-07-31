@@ -2,10 +2,11 @@ import json
 import os
 from typing import Any, List
 
+from src.json_saver_abstract import JSONAbstract
 from src.vacancy import Vacancy
 
 
-class JSONSaver:
+class JSONSaver(JSONAbstract):
     """Класс для работы с сохранением вакансий в JSON файл."""
 
     def __init__(self, filename: str) -> None:
@@ -32,7 +33,7 @@ class JSONSaver:
             print(f"Файл {self.filename} не найден.")
             return []
         except json.JSONDecodeError:
-            print(f"Ошибка декодирования JSON в файле {self.filename}.")
+            print(f"Ошибка декодирования JSON в файле vacancies.json.")
             return []
         except Exception as e:
             print(f"Произошла ошибка: {e}")
@@ -47,5 +48,5 @@ class JSONSaver:
     def delete_vacancy(self, vacancy: Vacancy) -> Any:
         """Удаляет вакансию из JSON файла."""
         vacancies = self.load_vacancies()
-        vacancies = [v for v in vacancies if v != vacancy]
+        vacancies = [v for v in vacancies if v._id != vacancy._id]
         self.save_vacancies(vacancies)

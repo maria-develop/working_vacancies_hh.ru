@@ -14,7 +14,7 @@ class TestVacancy(VacancyMixin):
         self.salary = salary
         self.description = description
         self.snippet = snippet
-        super().__init__()
+        super().__init__(id, name, area, url, salary, description, snippet)
 
 
 def test_vacancy_mixin_repr():
@@ -28,7 +28,7 @@ def test_vacancy_mixin_repr():
         snippet={"requirement": "Experience with Python", "responsibility": "Develop applications"},
     )
     expected_repr = (
-        "TestVacancy(1, Software Engineer, {'name': 'Moscow'}, {'name': 'Moscow'}, "
+        "TestVacancy(1, Software Engineer, {'name': 'Moscow'}, "
         "{'from': 1000, 'to': 2000}, A great job, "
         "{'requirement': 'Experience with Python', 'responsibility': 'Develop applications'})"
     )
@@ -46,7 +46,7 @@ def test_vacancy_mixin_init_prints_repr(capfd):
         snippet={"requirement": "Experience with Python", "responsibility": "Develop applications"},
     )
     expected_repr = (
-        "TestVacancy(1, Software Engineer, {'name': 'Moscow'}, {'name': 'Moscow'}, "
+        "TestVacancy(1, Software Engineer, {'name': 'Moscow'}, "
         "{'from': 1000, 'to': 2000}, A great job, "
         "{'requirement': 'Experience with Python', 'responsibility': 'Develop applications'})\n"
     )

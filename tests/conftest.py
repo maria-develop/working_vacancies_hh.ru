@@ -63,7 +63,7 @@ def json_saver():
     #         def json(self):
     #             return self.json_data
 
-    return MockResponse
+    # return MockResponse
 
 
 @pytest.fixture
