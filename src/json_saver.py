@@ -39,11 +39,17 @@ class JSONSaver(JSONAbstract):
             print(f"Произошла ошибка: {e}")
             return []
 
-    def add_vacancy(self, vacancy: Vacancy) -> Any:
+    def add_vacancy(self, vacancy: Vacancy) -> None:
         """Добавляет вакансию в JSON файл."""
         vacancies = self.load_vacancies()
         vacancies.append(vacancy)
         self.save_vacancies(vacancies)
+
+    def add_vacancies(self, vacancies: list[Vacancy]) -> None:
+        """Добавляет все 2000 вакансий"""
+        old_vacancies = self.load_vacancies()
+        old_vacancies.extend(vacancies)
+        self.save_vacancies(old_vacancies)
 
     def delete_vacancy(self, vacancy: Vacancy) -> Any:
         """Удаляет вакансию из JSON файла."""

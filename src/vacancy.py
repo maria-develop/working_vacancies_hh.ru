@@ -60,17 +60,17 @@ class Vacancy(VacancyMixin):
     #     return (f"Вакансия: {self.name}"
     #             f"\nСсылка: {self.url}\nЗарплата: {salary_str}\nОписание: {self.snippet['responsibility']}")
 
-    # @property
-    # def id(self):
-    #     return self._id
+    @property
+    def id(self):
+        return self._id
 
     @property
     def name(self):
         return self.__name
 
-    # @property
-    # def salary(self):
-    #     return self._salary
+    @property
+    def salary(self):
+        return self._salary
 
     def __str__(self) -> str:
         """Возвращает строковое представление объекта вакансии."""
@@ -106,7 +106,7 @@ class Vacancy(VacancyMixin):
         return False
 
     @staticmethod
-    def _validate_salary(salary: int | tuple[Any | None, Any | None]) -> int | tuple[int, int] | None:
+    def _validate_salary(salary: (int, float, list, tuple)) -> int | tuple[int, int] | None:
         """Валидирует и преобразует значение зарплаты."""
         if isinstance(salary, dict):
             from_salary = salary.get("from")

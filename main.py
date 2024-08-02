@@ -29,22 +29,12 @@ def user_interaction() -> None:
             keyword = input("Введите ключевое слово для поиска: ")
             hh_vacancies = hh_api.get_vacancies(keyword)
             vacancies_list = Vacancy.cast_to_object_list(hh_vacancies)
+            json_saver.add_vacancies(vacancies_list)
             for vacancy in vacancies_list:
-                json_saver.add_vacancy(vacancy)
+                # json_saver.add_vacancy(vacancy)
                 print(vacancy)
             print(f"Добавлено {len(vacancies_list)} вакансий по запросу '{keyword}'.")
             sys.exit()
-
-            # filtered_vacancies = [
-            #     vacancy
-            #     for vacancy in vacancies_list
-            #     if isinstance(vacancy.salary, int) and salary_from <= vacancy.salary <= salary_to
-            # ]
-            # if filtered_vacancies:
-            #     for vacancy in filtered_vacancies:
-            #         print(vacancy)
-            # else:
-            #     print(f"Вакансии в диапазоне зарплат от {salary_from} до {salary_to} не найдены.")
 
         elif option == "2":
             try:
@@ -54,9 +44,10 @@ def user_interaction() -> None:
                 continue
 
             # Загрузка вакансий из hh.ru
-            hh_vacancies = hh_api.get_vacancies("")
-            vacancies = Vacancy.cast_to_object_list(hh_vacancies)
-            # vacancies = json_saver.load_vacancies()
+            # hh_vacancies = hh_api.get_vacancies("")
+            # vacancies = Vacancy.cast_to_object_list(hh_vacancies)
+            # Загрузка вакансий из файла
+            vacancies = json_saver.load_vacancies()
             if not vacancies:
                 print("Нет сохраненных вакансий.")
                 continue
@@ -83,9 +74,11 @@ def user_interaction() -> None:
 
         elif option == "3":
             keyword = input("Введите ключевое слово для фильтрации вакансий: ").lower()
+            # Загрузка вакансий с hh.ru
+            # hh_vacancies = hh_api.get_vacancies(keyword)
+            # vacancies = Vacancy.cast_to_object_list(hh_vacancies)
             # Загрузка вакансий из файла
-            hh_vacancies = hh_api.get_vacancies(keyword)
-            vacancies = Vacancy.cast_to_object_list(hh_vacancies)
+            vacancies = json_saver.load_vacancies()
             if not vacancies:
                 print("Нет сохраненных вакансий.")
                 continue
@@ -118,8 +111,9 @@ def user_interaction() -> None:
             print("Введите диапазон зарплат")
             salary_from = int(input("от: "))
             salary_to = int(input("до: "))
-            hh_vacancies = hh_api.get_vacancies("")
-            vacancies_list = Vacancy.cast_to_object_list(hh_vacancies)
+            # hh_vacancies = hh_api.get_vacancies("")
+            # vacancies_list = Vacancy.cast_to_object_list(hh_vacancies)
+            vacancies_list = json_saver.load_vacancies()
             filtered_vacancies = [
                 vacancy
                 for vacancy in vacancies_list
@@ -134,11 +128,10 @@ def user_interaction() -> None:
                 print(f"Вакансии в диапазоне зарплат от {salary_from} до {salary_to} не найдены.")
             sys.exit()
 
-
         elif option == "5":
             vacancy_id = input("Введите ID вакансии для удаления: ")
             vacancies = json_saver.load_vacancies()
-            vacancy_to_delete = next((vacancy for vacancy in vacancies if vacancy._id == vacancy_id), None)
+            vacancy_to_delete = next((vacancy for vacancy in vacancies if vacancy.id == vacancy_id), None)
             if vacancy_to_delete:
                 json_saver.delete_vacancy(vacancy_to_delete)
                 print(f"Вакансия с ID {vacancy_id} удалена.")
@@ -149,7 +142,7 @@ def user_interaction() -> None:
         elif option == "6":
             vacancy_id = input("Введите ID вакансии для добавления: ")
             vacancies = json_saver.load_vacancies()
-            vacancy_to_add = next((vacancy for vacancy in vacancies if vacancy._id == vacancy_id), None)
+            vacancy_to_add = next((vacancy for vacancy in vacancies if vacancy.id == vacancy_id), None)
             if vacancy_to_add:
                 json_saver.add_vacancy(vacancy_to_add)
                 print(f"Вакансия с ID {vacancy_id} добавлена.")
